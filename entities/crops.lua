@@ -1,5 +1,6 @@
 function icrops()
   seeds={}
+  crops={}
 end
 
 function ucrops()
@@ -8,14 +9,37 @@ function ucrops()
   end
 
   grow_seeds()
+  grow_crops()
+end
+
+function dcrops()
+  
 end
 
 function grow_seeds()
   for s in all(seeds) do
     s.tig+=1
 
-    if s.tig>300 then
+    if s.tig>s.si then
       mset(s.x,s.y,4)
+      add(crops, {
+        x=s.x,
+        y=s.y,
+        tig=0,
+        si=300+rnd(300)
+      })
+      del(seeds, s)
+    end
+  end
+end
+
+function grow_crops()
+  for c in all(crops) do
+    c.tig+=1
+
+    if c.tig>c.si then
+      mset(c.x,c.y,5)
+      del(crops, c)
     end
   end
 end
@@ -30,7 +54,8 @@ function plant_seeds()
    add(seeds,{
     x=ptx,
     y=pty,
-    tig=0
+    tig=0,
+    si=300+rnd(300)
   })
   end  
 end
