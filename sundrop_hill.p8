@@ -2,25 +2,26 @@ pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
 #include entities/map.lua
-#include entities/crops.lua
+#include entities/inventory.lua
 #include entities/player.lua
 
 
 function _init()
   imap()
   iplr()
-  icrops()
+  iinv()
 end
 
 function _update()
- uplr()
- ucrops()
+  umap()
+  uplr()
+  uinv()
 end
 
 function _draw()
- dmap()
- dplr()
- dcrops()
+  dmap()
+  dplr()
+  dinv()
 end
 
 
