@@ -5,7 +5,7 @@ end
 
 function umap()
   for c in all(crops) do
-    if rnd()>=0.6 and c.sp<5 then
+    if rnd()>=0.6 and c.sp>2 and c.sp<5 then
       c.tig+=1
       if c.tig >= c.si then
         c.tig=0
@@ -54,7 +54,7 @@ function harvest()
     
     plr.ply_ani=true
   
-    if fget(mget(ptx, pty), 1) then
+    if inv.seeds>0 and fget(mget(ptx, pty), 1) then
       add(crops,{
         x=ptx,
         y=pty,
