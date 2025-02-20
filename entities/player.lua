@@ -23,7 +23,7 @@ function uplr()
     plr.y += 1
   end
 
-  if collide() then
+  if collide() or off_screen() then
     plr.x=lx
     plr.y=ly
   end
@@ -55,6 +55,17 @@ end
 
 function dplr()
   spr(plr.sp,plr.x,plr.y)
+end
+
+function off_screen()
+  local px=(plr.x+4)/8
+  local py=(plr.y+4)/8
+
+  if px < 0 or px > 16 or py < 0 or py > 16 then 
+    return true
+  else
+    return false
+  end
 end
 
 function collide()
