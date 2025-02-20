@@ -23,13 +23,30 @@ function dmap()
 end
 
 function gen_map()
-    for x=0,128 do
-        for y=0,128 do
-            if rnd()<0.1 then
-                mset(x,y,1)
-            end
-        end
+  -- Random grass
+  for x=0,16 do    
+    for y=0,16 do
+      if rnd()<0.1 then
+        mset(x,y,1)
+      end
+
+      if y<2 and (x==7 or x==8) then
+        mset(x,y,10)
+      end
     end
+    mset(x,2,11)
+  end
+
+  -- fence post ends
+  mset(6,2,27)
+  mset(9,2,43)
+
+  -- path
+  mset(7,2,10)
+  mset(8,2,10)
+  -- path ends
+  mset(7,3,26)
+  mset(8,3,26)
 end
 
 function plant(ptx, pty)

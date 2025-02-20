@@ -1,8 +1,8 @@
 -- player --
 function iplr()
   plr={
-    x=63,
-    y=63,
+    x=60,
+    y=29,
     sp=12,
     ani_spd=1,
     ani_tmr=0
