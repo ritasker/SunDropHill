@@ -26,35 +26,26 @@ function gen_map()
   -- Random grass
   for x=0,16 do
     for y=4,16 do
-      if rnd()<0.1 then
+      if rnd()<0.15 then
         mset(x,y,1)
-      end      
+      end
     end
-    mset(x,3,11)
   end
 
+  for x=0,16 do
+    if x<6 or x>9 then
+      mset(x,3,11)
+    end
+  end
+  
   -- fence post ends
   mset(6,3,27)
   mset(9,3,43)
-
-  -- path
-  for x=7,8 do
-    for y=0,3 do
-      mset(x,y,10)
-    end
-  end
-
-  -- path to shop
-  mset(6,2,10)
-  -- path ends
-  mset(7,4,26)
-  mset(8,4,26)
 end
 
 function plant(ptx, pty)
-  plr.ply_ani=true
-
   if inv.seeds>0 then
+    plr.ply_ani=true
     add(crops,{
       x=ptx,
       y=pty,

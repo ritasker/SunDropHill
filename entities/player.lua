@@ -43,6 +43,11 @@ function uplr()
 
     if fget(mget(ptx, pty), 2) then
       harvest(ptx, pty)
+    elseif fget(mget(ptx, pty), 3) then
+      if inv.gold>0 then
+        inv.gold-=1
+        inv.seeds+=1
+      end
     elseif mget(ptx, pty)==2 then
       water(ptx,pty)
     end
