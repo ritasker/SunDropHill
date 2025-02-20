@@ -10,6 +10,9 @@ function iplr()
 end
    
 function uplr()
+  local lx=plr.x
+  local ly=plr.y
+
   if btn(➡️) then
     plr.x += 1
   elseif btn(⬅️) then
@@ -18,6 +21,11 @@ function uplr()
     plr.y -= 1
   elseif btn(⬇️) then
     plr.y += 1
+  end
+
+  if collide() then
+    plr.x=lx
+    plr.y=ly
   end
 
   if btn(🅾️) then
@@ -47,6 +55,18 @@ end
 
 function dplr()
   spr(plr.sp,plr.x,plr.y)
+end
+
+function collide()
+  local px1=(plr.x+3)/8
+  local px2=(plr.x+4)/8
+  local py=(plr.y+5)/8
+
+  if fget(mget(px1,py),0) or fget(mget(px2,py),0) then
+    return true
+  else 
+    return false
+  end
 end
 
 function ply_ani()
