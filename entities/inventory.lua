@@ -1,31 +1,24 @@
 function iinv()
-    inv={
+  inv={
     carrots=0,
     seeds=0,
     gold=5
-    }
+  }
 end
 
 function uinv()
 end
 
 function dinv()
-    rnd_carrots()
-    rnd_seeds()
-    rnd_gold()
+    rnd_hotbar()
 end
 
-function rnd_carrots()
-    spr(17, 110, 2)
-    print(inv.carrots, 120, 5, 7)
-end
-
-function rnd_seeds()
-    spr(16, 93, 2)
-    print(inv.seeds, 103, 5, 7)
-end
-
-function rnd_gold()
-    spr(18, 75, 2)
-    print(inv.gold, 85, 5, 7)
+function rnd_hotbar()
+    rectfill(30,115,100,124,13)
+    spr(16, 31, 116)
+    rect(30,115,39,124,7)
+    spr(17, 40, 116)
+    rect(39,115,48,124,7)
+    spr(18, 49, 116)
+    rect(48,115,57,124,7)
 end
