@@ -44,17 +44,24 @@ function gen_map()
 end
 
 function plant(ptx, pty)
-  if inv.seeds>0 then
-    plr.ply_ani=true
-    add(crops,{
-      x=ptx,
-      y=pty,
-      wtd=false,
-      sp=2,
-      tig=0,
-      si=300+rnd(300)
-    })
-    inv.seeds-=1
+  local seeds = get_inv_item_by_name(inv, "Seeds")
+  if seeds != nil then
+    if seeds.qty>0 then
+      plr.ply_ani=true
+      add(crops,{
+        x=ptx,
+        y=pty,
+        wtd=false,
+        sp=2,
+        tig=0,
+        si=300+rnd(300)
+      })
+      seeds.qty-=1
+
+      if seeds.qty == 0 then
+        del(inv, seeds)
+      end
+    end
   end
 end
 
@@ -73,8 +80,16 @@ function harvest(ptx, pty)
     for c in all(crops) do
       if c.x==ptx and c.y==pty then
         c.sp=0
-        inv.carrots+=1
-        inv.seeds+=2
+        local carrots = get_inv_item_by_name(inv, "Carrots")
+        if carrots == nil then
+          add(inv, {
+            name="Carrots",
+            qty=1,
+            sp=17
+          })
+        else
+          carrots.qty+=1
+        end
       end
     end
   end

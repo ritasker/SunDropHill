@@ -44,9 +44,26 @@ function uplr()
     if fget(mget(ptx, pty), 2) then
       harvest(ptx, pty)
     elseif fget(mget(ptx, pty), 3) then
-      if inv.gold>0 then
-        inv.gold-=1
-        inv.seeds+=1
+      gold=get_inv_item_by_name(inv, "Gold")
+      if gold != nil then
+        if gold.qty>0 then
+          gold.qty-=1
+          
+          if gold.qty == 0 then
+            del(inv,gold)
+          end
+
+          seeds=get_inv_item_by_name(inv, "Seeds")
+          if seeds==nil then
+            add(inv, {
+              name="Seeds",
+              qty=1,
+              sp=16
+            })
+          else
+            seeds.qty+=1
+          end
+        end
       end
     elseif mget(ptx, pty)==2 then
       water(ptx,pty)
