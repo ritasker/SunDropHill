@@ -1,9 +1,12 @@
 function iinv()
-  inv={
-    carrots=0,
-    seeds=0,
-    gold=5
-  }
+  inv={}
+
+  add(inv,{
+    name="Gold",
+    qty=10,
+    sp=18
+  })
+
 end
 
 function uinv()
@@ -14,11 +17,18 @@ function dinv()
 end
 
 function rnd_hotbar()
-    rectfill(30,115,100,124,13)
-    spr(16, 31, 116)
-    rect(30,115,39,124,7)
-    spr(17, 40, 116)
-    rect(39,115,48,124,7)
-    spr(18, 49, 116)
-    rect(48,115,57,124,7)
+    rectfill(32,112,43,123,19)
+    rect(32,112,43,123,5)
+    rect(44,12,55,123,5)
+    
+    spr(18,34,114)
+    print(10,34,106,13)
+   -- rect(33,113,42,122,10)
+    
+
+    -- for i=1,#inv do
+    --   if inv[i].ihb then
+    --     spr(inv[i].sp,23+(i*8),116)
+    --   end
+    -- end
 end
