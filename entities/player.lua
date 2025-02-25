@@ -63,10 +63,12 @@ function dplr()
 end
 
 function off_screen()
-  local px=(plr.x+4)/8
-  local py=(plr.y+4)/8
+  local px1=(plr.x+1)/8
+  local px2=(plr.x+7)/8
+  local py1=(plr.y+1)/8
+  local py2=(plr.y+8)/8
 
-  if px < 0 or px > 16 or py < 0 or py > 16 then 
+  if px1 < 0 or px2 > 16 or py1 < 0 or py2 > 16 then 
     return true
   else
     return false
