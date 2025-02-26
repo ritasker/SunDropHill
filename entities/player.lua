@@ -13,14 +13,16 @@ function uplr()
   local lx=plr.x
   local ly=plr.y
 
-  if btn(➡️) then
-    plr.x += 1
-  elseif btn(⬅️) then
-    plr.x -= 1
-  elseif btn(⬆️) then
-    plr.y -= 1
-  elseif btn(⬇️) then
-    plr.y += 1
+  if not menu_visable then
+    if btn(➡️) then
+      plr.x += 1
+    elseif btn(⬅️) then
+      plr.x -= 1
+    elseif btn(⬆️) then
+      plr.y -= 1
+    elseif btn(⬇️) then
+      plr.y += 1
+    end
   end
 
   if collide() or off_screen() then
@@ -37,26 +39,30 @@ function uplr()
     elseif over_fully_grown_crop(ptx, pty) then
       harvest(ptx, pty)
     elseif at_store(ptx, pty) then
-      gold=get_inv_item_by_name(inv, "gold")
-      if gold != nil then
-        if gold.qty>0 then
-          gold.qty-=1
+      if not menu_visable then
+      m_sel=1
+      show_top_menu=true
+      -- gold=get_inv_item_by_name(inv, "gold")
+      -- if gold != nil then
+      --   if gold.qty>0 then
+      --     gold.qty-=1
           
-          if gold.qty == 0 then
-            del(inv,gold)
-          end
+      --     if gold.qty == 0 then
+      --       del(inv,gold)
+      --     end
 
-          seeds=get_inv_item_by_name(inv, "seeds")
-          if seeds==nil then
-            add(inv, {
-              name="seeds",
-              qty=1,
-              sp=16
-            })
-          else
-            seeds.qty+=1
-          end
-        end
+      --     seeds=get_inv_item_by_name(inv, "seeds")
+      --     if seeds==nil then
+      --       add(inv, {
+      --         name="seeds",
+      --         qty=1,
+      --         sp=16
+      --       })
+      --     else
+      --       seeds.qty+=1
+      --     end
+      --   end
+      -- end
       end
     elseif over_planted_seeds then
       water(ptx,pty)

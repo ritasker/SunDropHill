@@ -24,7 +24,7 @@ function _draw()
   dmap()
   dplr()
   dinv()
-  dmenu()
+  dmenu()  
 end
 
 
