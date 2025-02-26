@@ -1,32 +1,29 @@
 pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
-#include entities/map.lua
-#include entities/inventory.lua
-#include entities/player.lua
+#include entities/game.lua
 #include entities/menu.lua
 
 function _init()
-  imap()
-  iplr()
-  iinv()
-  imenu()
+  init_game()
+  state="game"
 end
 
 function _update()
-  umap()
-  uplr()
-  uinv()
-  umenu()
+  if state=="game" then
+    update_game()
+  elseif state=="menu" then
+    update_menu()
+  end
 end
 
 function _draw()
-  dmap()
-  dplr()
-  dinv()
-  dmenu()  
+if state=="game" then
+    draw_game()
+  elseif state=="menu" then
+    draw_menu()
+  end
 end
-
 
 __gfx__
 00000000000000000444444004444440044444400344343000000000000000000000000000000000555d5555000ff00000000000000000000000000000000000
