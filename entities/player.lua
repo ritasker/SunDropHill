@@ -2,7 +2,7 @@
 function iplr()
   plr={
     x=60,
-    y=29,
+    y=32,
     sp=12,
     ani_spd=1,
     ani_tmr=0
@@ -28,23 +28,16 @@ function uplr()
     plr.y=ly
   end
 
-  if btn(🅾️) then
+  if btnp(❎) then
     local ptx=flr((plr.x+4)/8)
     local pty=flr((plr.y+4)/8)
-    
-    if fget(mget(ptx, pty), 1) then
+
+    if over_farmable_land(ptx, pty) and seeds_selected() then
       plant(ptx, pty)
-    end
-  end
-
-  if btn(❎) then
-    local ptx=flr((plr.x+4)/8)
-    local pty=flr((plr.y+4)/8)
-
-    if fget(mget(ptx, pty), 2) then
+    elseif over_fully_grown_crop(ptx, pty) then
       harvest(ptx, pty)
-    elseif fget(mget(ptx, pty), 3) then
-      gold=get_inv_item_by_name(inv, "Gold")
+    elseif at_store(ptx, pty) then
+      gold=get_inv_item_by_name(inv, "gold")
       if gold != nil then
         if gold.qty>0 then
           gold.qty-=1
@@ -53,10 +46,10 @@ function uplr()
             del(inv,gold)
           end
 
-          seeds=get_inv_item_by_name(inv, "Seeds")
+          seeds=get_inv_item_by_name(inv, "seeds")
           if seeds==nil then
             add(inv, {
-              name="Seeds",
+              name="seeds",
               qty=1,
               sp=16
             })
@@ -65,13 +58,54 @@ function uplr()
           end
         end
       end
-    elseif mget(ptx, pty)==2 then
+    elseif over_planted_seeds then
       water(ptx,pty)
     end
   end
 
   if plr.ply_ani then
     ply_ani()
+  end
+end
+
+function over_planted_seeds(x, y)
+  if mget(ptx, pty)==2 then
+    return true
+  else
+    return false
+  end
+end
+
+function over_farmable_land(x, y)
+  if fget(mget(x, y), 1) then
+    return true
+  else
+    return false
+  end
+end
+
+function over_fully_grown_crop(x, y)
+  if fget(mget(x, y), 2) then
+    return true
+  else
+    return false
+  end
+end
+
+
+function at_store(x, y)
+  if fget(mget(x, y), 3) then
+    return true
+  else
+    return false
+  end
+end
+
+function seeds_selected()
+  if inv[sel].name=="seeds" then
+    return true
+  else
+    return false
   end
 end
 
@@ -103,6 +137,58 @@ function collide()
     return false
   end
 end
+
+function plant(ptx, pty)
+  local seeds = get_inv_item_by_name(inv, "seeds")
+  if seeds != nil then
+    if seeds.qty>0 then
+      plr.ply_ani=true
+      add(crops,{
+        x=ptx,
+        y=pty,
+        wtd=false,
+        sp=2,
+        tig=0,
+        si=300+rnd(300)
+      })
+      seeds.qty-=1
+
+      if seeds.qty == 0 then
+        del(inv, seeds)
+        sel=1
+      end
+    end
+  end
+end
+
+function water(ptx, pty)
+  for c in all(crops) do
+    if c.x==ptx and c.y==pty then
+      c.wtd=true
+      c.sp=3
+    end
+  end
+end
+
+function harvest(ptx, pty)
+    plr.ply_ani=true
+
+    for c in all(crops) do
+      if c.x==ptx and c.y==pty then
+        c.sp=0
+        local carrots = get_inv_item_by_name(inv, "carrots")
+        if carrots == nil then
+          add(inv, {
+            name="carrots",
+            qty=1,
+            sp=17
+          })
+        else
+          carrots.qty+=1
+        end
+      end
+    end
+  end
 
 function ply_ani()
   if plr.ani_tmr<plr.ani_spd then

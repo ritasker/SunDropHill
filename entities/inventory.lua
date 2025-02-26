@@ -1,8 +1,9 @@
 function iinv()
+  sel=1
   inv={}
 
   add(inv,{
-    name="Gold",
+    name="gold",
     qty=10,
     sp=18
   })
@@ -11,6 +12,13 @@ function iinv()
 end
 
 function uinv()
+  if btnp(🅾️) and #inv > 0 then
+    if sel == #inv then
+      sel=1
+    else
+      sel+=1
+    end
+  end
 end
 
 function dinv()
@@ -33,10 +41,9 @@ function rnd_hotbar()
       end
     end
     
-   -- rect(33,113,42,122,10)
-    
-
-    
+    if #inv > 0 then
+      rect(23+(10*sel)+(2*(sel-1)),113,32+(10*sel)+(2*(sel-1)),122,10)
+    end
 end
 
 function get_inv_item_by_name(t, name)
