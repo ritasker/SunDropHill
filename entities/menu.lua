@@ -11,13 +11,6 @@ function init_menu()
             sp = 16
         }
     )
-    add(
-        store_inv, {
-            name = "carrots",
-            gp = 1,
-            sp = 17
-        }
-    )
 end
 
 function update_menu()
@@ -72,14 +65,14 @@ function update_buy_menu()
     end
 
     if btnp(❎) then
-        local gold = get_inv_item_by_name(inv, "gold")
+        local gold = get_inv_item_by_name(plr_inv, "gold")
         if gold != nil and gold.qty > 0 then
-            local seeds = get_inv_item_by_name(inv, "seeds")
+            local seeds = get_inv_item_by_name(plr_inv, "seeds")
             if seeds != nil then
                 seeds.qty += 1
             else
                 add(
-                    inv, {
+                    plr_inv, {
                         name = "seeds",
                         qty = 1,
                         sp = 16
@@ -96,6 +89,29 @@ function update_buy_menu()
 end
 
 function update_sell_menu()
+    if btnp(❎) then
+        local carrots = get_inv_item_by_name(plr_inv, "carrots")
+        if carrots != nil and carrots.qty > 0 then
+            local gold = get_inv_item_by_name(plr_inv, "gold")
+            if gold != nil then
+                gold.qty += carrots.gp
+            else
+                add(
+                    plr_inv, {
+                        name = "gold",
+                        qty = carrots.gp,
+                        sp = 18
+                    }
+                )
+            end
+            carrots.qty -= 1
+
+            if carrots.qty == 0 then
+                del(plr_inv, carrots)
+            end
+        end
+    end
+
     if btnp(🅾️) then
         menu_state = "store"
     end
@@ -125,7 +141,7 @@ function draw_store_menu()
 end
 
 function draw_buy_menu()
-    local gold = get_inv_item_by_name(inv, "gold")
+    local gold = get_inv_item_by_name(plr_inv, "gold")
     spr(gold.sp, 32, 39)
     print("X " .. gold.qty .. "gp", 42, 40, 7)
 
@@ -143,7 +159,19 @@ function draw_buy_menu()
 end
 
 function draw_sell_menu()
-    rectfill(32, 48, 96, 78, 2)
-    rect(33, 49, 95, 77, 13)
-    print("sell", 35, 50, 7)
+    local gold = get_inv_item_by_name(plr_inv, "gold")
+    spr(gold.sp, 32, 39)
+    print("X " .. gold.qty .. "gp", 42, 40, 7)
+
+    rectfill(32, 48, 96, 62, 2)
+    rect(33, 49, 95, 61, 13)
+
+    local carrots = get_inv_item_by_name(plr_inv, "carrots")
+    if carrots != nil then
+        spr(carrots.sp, 40, 51)
+        print(carrots.name, 50, 53, 7)
+        print(carrots.gp .. "gp", 82, 53, 7)
+
+        print("▶", 36, 53, 7)
+    end
 end

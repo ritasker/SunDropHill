@@ -7,8 +7,8 @@ function init_game()
   }
 
   inv_sel=1
-  inv = {}
-  add(inv, {
+  plr_inv = {}
+  add(plr_inv, {
     name = "gold",
     qty = 10,
     sp = 18
@@ -38,29 +38,25 @@ function update_game()
     local pty = flr((plr.y + 6) / 8)
 
     if over_planted_seeds(ptx,pty) then
-      print("over seeds", 64, 64,7)
       water(ptx, pty)
     end
 
     if over_farmable_land(ptx, pty) and seeds_selected() then
-      print("over farmland", 64, 64,7)
       plant(ptx, pty)
     end    
 
     if over_fully_grown_crop(ptx, pty) then
-      print("over carrots", 64, 64,7)
       harvest(ptx, pty)
     end
     
     if at_store(ptx, pty) then
-      print("at store", 64, 64,7)
       init_menu()
       state="menu"
     end
   end
 
-  if btnp(🅾️) and #inv > 0 then
-    if inv_sel == #inv then
+  if btnp(🅾️) and #plr_inv > 0 then
+    if inv_sel == #plr_inv then
       inv_sel = 1
     else
       inv_sel += 1
@@ -153,7 +149,7 @@ function at_store(x, y)
 end
 
 function seeds_selected()
-  return inv[inv_sel].name == "seeds"
+  return plr_inv[inv_sel].name == "seeds"
 end
 
 function get_inv_item_by_name(t, name)
@@ -173,18 +169,18 @@ function draw_hotbar()
   rect(68, 112, 79, 123, 5)
   rect(80, 112, 91, 123, 5)
 
-  for i = 1, #inv do
-    spr(inv[i].sp, 23 + (8 * i) + (4 * i - 1), 114)
-    print(inv[i].qty, 23 + (8 * i) + (4 * i - 1), 106, 7)
+  for i = 1, #plr_inv do
+    spr(plr_inv[i].sp, 23 + (8 * i) + (4 * i - 1), 114)
+    print(plr_inv[i].qty, 23 + (8 * i) + (4 * i - 1), 106, 7)
   end
 
-  if #inv > 0 then
+  if #plr_inv > 0 then
     rect(23 + (10 * inv_sel) + (2 * (inv_sel - 1)), 113, 32 + (10 * inv_sel) + (2 * (inv_sel - 1)), 122, 10)
   end
 end
 
 function plant(x, y)
-  local seeds = get_inv_item_by_name(inv, "seeds")
+  local seeds = get_inv_item_by_name(plr_inv, "seeds")
   if seeds != nil and seeds.qty > 0 then
     plr.ply_ani = true
     add(crops, {
@@ -198,7 +194,7 @@ function plant(x, y)
     seeds.qty -= 1
 
     if seeds.qty == 0 then
-      del(inv, seeds)
+      del(plr_inv, seeds)
       inv_sel = 1
     end
   end  
@@ -219,11 +215,12 @@ function harvest(x, y)
   for c in all(crops) do
     if c.x == x and c.y == y then
       c.sp = 0
-      local carrots = get_inv_item_by_name(inv, "carrots")
+      local carrots = get_inv_item_by_name(plr_inv, "carrots")
       if carrots == nil then
-        add(inv, {
+        add(plr_inv, {
           name = "carrots",
           qty = 1,
+          gp=5,
           sp = 17
         })
       else
