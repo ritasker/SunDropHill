@@ -18,6 +18,9 @@ function _update()
 end
 
 function _draw()
+  cls(11)
+  map()
+  
 if state=="game" then
     draw_game()
   elseif state=="menu" then

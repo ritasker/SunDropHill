@@ -1,7 +1,23 @@
 function init_menu()
     m_sel = 1
     menu_state = "store"
-    top_menu_item = { "buy", "sell" }
+    store_menu_items = { "buy", "sell" }
+
+    store_inv = {}
+    add(
+        store_inv, {
+            name = "seeds",
+            gp = 1,
+            sp = 16
+        }
+    )
+    add(
+        store_inv, {
+            name = "carrots",
+            gp = 1,
+            sp = 17
+        }
+    )
 end
 
 function update_menu()
@@ -16,7 +32,7 @@ end
 
 function update_store_menu()
     if btnp(➡️) then
-        if m_sel < #top_menu_item then
+        if m_sel < #store_menu_items then
             m_sel += 1
         else
             m_sel = 1
@@ -25,13 +41,15 @@ function update_store_menu()
         if m_sel > 1 then
             m_sel -= 1
         else
-            m_sel = #top_menu_item
+            m_sel = #store_menu_items
         end
     elseif btnp(❎) then
-        if top_menu_item[m_sel] == "buy" then
+        if store_menu_items[m_sel] == "buy" then
             menu_state = "buy"
-        elseif top_menu_item[m_sel] == "sell" then
+            m_sel = 1
+        elseif store_menu_items[m_sel] == "sell" then
             menu_state = "sell"
+            m_sel = 1
         end
     elseif btnp(🅾️) then
         state = "game"
@@ -39,6 +57,39 @@ function update_store_menu()
 end
 
 function update_buy_menu()
+    if btnp(⬇️) then
+        if m_sel < #store_inv then
+            m_sel += 1
+        else
+            m_sel = 1
+        end
+    elseif btnp(⬆️) then
+        if m_sel > 1 then
+            m_sel -= 1
+        else
+            m_sel = #store_inv
+        end
+    end
+
+    if btnp(❎) then
+        local gold = get_inv_item_by_name(inv, "gold")
+        if gold != nil and gold.qty > 0 then
+            local seeds = get_inv_item_by_name(inv, "seeds")
+            if seeds != nil then
+                seeds.qty += 1
+            else
+                add(
+                    inv, {
+                        name = "seeds",
+                        qty = 1,
+                        sp = 16
+                    }
+                )
+            end
+            gold.qty -= 1
+        end
+    end
+
     if btnp(🅾️) then
         menu_state = "store"
     end
@@ -66,16 +117,29 @@ function draw_store_menu()
     print("WHAT DO YOU", 35, 50, 7)
     print("WANT TO DO?", 35, 57, 7)
 
-    for i = 1, #top_menu_item do
-        print(top_menu_item[i], 40 + (20 * (i - 1)), 68, 7)
-        print("▶", 35 + (20 * (m_sel - 1)), 68, 7)
+    for i = 1, #store_menu_items do
+        print(store_menu_items[i], 40 + (20 * (i - 1)), 68, 7)
     end
+
+    print("▶", 35 + (20 * (m_sel - 1)), 68, 7)
 end
 
 function draw_buy_menu()
-    rectfill(32, 48, 96, 78, 2)
-    rect(33, 49, 95, 77, 13)
-    print("buy", 35, 50, 7)
+    local gold = get_inv_item_by_name(inv, "gold")
+    spr(gold.sp, 32, 39)
+    print("X " .. gold.qty .. "gp", 42, 40, 7)
+
+    rectfill(32, 48, 96, 52 + (10 * #store_inv), 2)
+    rect(33, 49, 95, 51 + (10 * #store_inv), 13)
+
+    for i = 1, #store_inv do
+        local si = store_inv[i]
+        spr(si.sp, 40, 41 + (10 * i))
+        print(si.name, 50, 43 + (10 * i), 7)
+        print(si.gp .. "gp", 82, 43 + (10 * i), 7)
+    end
+
+    print("▶", 36, 43 + (10 * m_sel), 7)
 end
 
 function draw_sell_menu()

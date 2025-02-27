@@ -35,15 +35,25 @@ function update_game()
 
   if btnp(❎) then
     local ptx = flr((plr.x + 4) / 8)
-    local pty = flr((plr.y + 4) / 8)
+    local pty = flr((plr.y + 6) / 8)
+
+    if over_planted_seeds(ptx,pty) then
+      print("over seeds", 64, 64,7)
+      water(ptx, pty)
+    end
 
     if over_farmable_land(ptx, pty) and seeds_selected() then
+      print("over farmland", 64, 64,7)
       plant(ptx, pty)
-    elseif over_planted_seeds() then
-      water(ptx, pty)
-    elseif over_fully_grown_crop(ptx, pty) then
+    end    
+
+    if over_fully_grown_crop(ptx, pty) then
+      print("over carrots", 64, 64,7)
       harvest(ptx, pty)
-    elseif at_store(ptx, pty) then
+    end
+    
+    if at_store(ptx, pty) then
+      print("at store", 64, 64,7)
       init_menu()
       state="menu"
     end
@@ -59,14 +69,9 @@ function update_game()
 end
 
 function draw_game()
-  -- draw map
-  cls(11)
-  map()
-
-  -- draw player
+ -- draw player
   spr(plr.sp, plr.x, plr.y)
 
-  -- draw hotbar
   draw_hotbar()
 end
 
@@ -80,6 +85,7 @@ function gen_map()
     end
   end
 
+-- fence
   for x = 0, 16 do
     if x < 6 or x > 9 then
       mset(x, 3, 11)
@@ -169,9 +175,7 @@ function draw_hotbar()
 
   for i = 1, #inv do
     spr(inv[i].sp, 23 + (8 * i) + (4 * i - 1), 114)
-    if inv[i].qty > 1 then
-      print(inv[i].qty, 23 + (8 * i) + (4 * i - 1), 106, 7)
-    end
+    print(inv[i].qty, 23 + (8 * i) + (4 * i - 1), 106, 7)
   end
 
   if #inv > 0 then
@@ -179,43 +183,41 @@ function draw_hotbar()
   end
 end
 
-function plant(ptx, pty)
+function plant(x, y)
   local seeds = get_inv_item_by_name(inv, "seeds")
-  if seeds != nil then
-    if seeds.qty > 0 then
-      plr.ply_ani = true
-      add(crops, {
-        x = ptx,
-        y = pty,
-        wtd = false,
-        sp = 2,
-        tig = 0,
-        si = 300 + rnd(300)
-      })
-      seeds.qty -= 1
+  if seeds != nil and seeds.qty > 0 then
+    plr.ply_ani = true
+    add(crops, {
+      x = x,
+      y = y,
+      wtd = false,
+      sp = 2,
+      tig = 0,
+      si = 300 + rnd(300)
+    })
+    seeds.qty -= 1
 
-      if seeds.qty == 0 then
-        del(inv, seeds)
-        sel = 1
-      end
+    if seeds.qty == 0 then
+      del(inv, seeds)
+      inv_sel = 1
     end
-  end
+  end  
 end
 
-function water(ptx, pty)
+function water(x, y)
   for c in all(crops) do
-    if c.x == ptx and c.y == pty then
+    if c.x == x and c.y == y then
       c.wtd = true
       c.sp = 3
     end
   end
 end
 
-function harvest(ptx, pty)
+function harvest(x, y)
   plr.ply_ani = true
 
   for c in all(crops) do
-    if c.x == ptx and c.y == pty then
+    if c.x == x and c.y == y then
       c.sp = 0
       local carrots = get_inv_item_by_name(inv, "carrots")
       if carrots == nil then
