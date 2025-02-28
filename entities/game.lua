@@ -1,20 +1,30 @@
 function init_game()
-  crops = {}
-  plr = {
-    x = 60,
-    y = 32,
-    sp = 12
-  }
-
-  inv_sel=1
-  plr_inv = {}
-  add(plr_inv, {
-    name = "gold",
-    qty = 10,
-    sp = 18
-  })
-
   gen_map()
+
+  crops = {}
+
+  for y = 4, 16 do
+    for x = 0, 16 do
+      if not collide(x, y) then
+        plr = {
+          x = 60,
+          y = 32,
+          sp = 12
+        }
+        break
+      end
+    end
+  end
+
+  inv_sel = 1
+  plr_inv = {}
+  add(
+    plr_inv, {
+      name = "gold",
+      qty = 10,
+      sp = 18
+    }
+  )
 end
 
 function update_game()
@@ -28,7 +38,7 @@ function update_game()
   if btn(⬆️) then plr.y -= 1 end
   if btn(⬇️) then plr.y += 1 end
 
-  if collide() or off_screen() then
+  if collide(plr.x, plr.y) or off_screen() then
     plr.x = lx
     plr.y = ly
   end
@@ -37,21 +47,21 @@ function update_game()
     local ptx = flr((plr.x + 4) / 8)
     local pty = flr((plr.y + 6) / 8)
 
-    if over_planted_seeds(ptx,pty) then
+    if over_planted_seeds(ptx, pty) then
       water(ptx, pty)
     end
 
     if over_farmable_land(ptx, pty) and seeds_selected() then
       plant(ptx, pty)
-    end    
+    end
 
     if over_fully_grown_crop(ptx, pty) then
       harvest(ptx, pty)
     end
-    
+
     if at_store(ptx, pty) then
       init_menu()
-      state="menu"
+      state = "menu"
     end
   end
 
@@ -65,23 +75,50 @@ function update_game()
 end
 
 function draw_game()
- -- draw player
+  -- draw player
   spr(plr.sp, plr.x, plr.y)
 
   draw_hotbar()
 end
 
 function gen_map()
-  -- Random grass
-  for x = 0, 16 do
-    for y = 4, 16 do
-      if rnd() < 0.15 then
+  for y = 4, 16 do
+    for x = 0, 16 do
+      local map_tile = mget(x, y)
+      if is_tree_tile(map_tile) then
+        goto continue
+      end
+
+      -- grass
+      if rnd() < 0.3 then
         mset(x, y, 1)
       end
+
+      -- flowers
+      if rnd() < 0.08 then
+        flower_idx = flr(rnd(3))
+        mset(x, y, 32 + flower_idx)
+      end
+
+      -- rocks
+      if rnd() < 0.07 then
+        mset(x, y, 37)
+      end
+
+      -- trees
+      if rnd() < 0.03 then
+        if not_on_tree(x, y) then
+          mset(x, y, 19)
+          mset(x + 1, y, 20)
+          mset(x, y + 1, 35)
+          mset(x + 1, y + 1, 36)
+        end
+      end
+      ::continue::
     end
   end
 
--- fence
+  -- fence
   for x = 0, 16 do
     if x < 6 or x > 9 then
       mset(x, 3, 11)
@@ -91,6 +128,22 @@ function gen_map()
   -- fence post ends
   mset(6, 3, 27)
   mset(9, 3, 43)
+end
+
+function not_on_tree(x, y)
+  local t1 = mget(x, y)
+  local t2 = mget(x + 1, y)
+  local t3 = mget(x, y + 1)
+  local t4 = mget(x + 1, y + 1)
+
+  return not is_tree_tile(t1)
+      or not is_tree_tile(t2)
+      or not is_tree_tile(t3)
+      or not is_tree_tile(t4)
+end
+
+function is_tree_tile(tile)
+  return tile == 19 or tile == 20 or tile == 35 or tile == 36
 end
 
 function update_crops()
@@ -120,10 +173,10 @@ function off_screen()
   end
 end
 
-function collide()
-  local px1 = (plr.x + 3) / 8
-  local px2 = (plr.x + 4) / 8
-  local py = (plr.y + 5) / 8
+function collide(plrx, plry)
+  local px1 = (plrx + 3) / 8
+  local px2 = (plrx + 4) / 8
+  local py = (plry + 5) / 8
 
   if fget(mget(px1, py), 0) or fget(mget(px2, py), 0) then
     return true
@@ -183,21 +236,23 @@ function plant(x, y)
   local seeds = get_inv_item_by_name(plr_inv, "seeds")
   if seeds != nil and seeds.qty > 0 then
     plr.ply_ani = true
-    add(crops, {
-      x = x,
-      y = y,
-      wtd = false,
-      sp = 2,
-      tig = 0,
-      si = 300 + rnd(300)
-    })
+    add(
+      crops, {
+        x = x,
+        y = y,
+        wtd = false,
+        sp = 2,
+        tig = 0,
+        si = 300 + rnd(300)
+      }
+    )
     seeds.qty -= 1
 
     if seeds.qty == 0 then
       del(plr_inv, seeds)
       inv_sel = 1
     end
-  end  
+  end
 end
 
 function water(x, y)
@@ -217,12 +272,14 @@ function harvest(x, y)
       c.sp = 0
       local carrots = get_inv_item_by_name(plr_inv, "carrots")
       if carrots == nil then
-        add(plr_inv, {
-          name = "carrots",
-          qty = 1,
-          gp=5,
-          sp = 17
-        })
+        add(
+          plr_inv, {
+            name = "carrots",
+            qty = 1,
+            gp = 5,
+            sp = 17
+          }
+        )
       else
         carrots.qty += 1
       end
