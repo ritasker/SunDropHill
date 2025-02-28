@@ -9,7 +9,8 @@ function init_game()
         plr = {
           x = 60,
           y = 32,
-          sp = 12
+          sp = 12,
+          gp=10
         }
         break
       end
@@ -18,13 +19,6 @@ function init_game()
 
   inv_sel = 1
   plr_inv = {}
-  add(
-    plr_inv, {
-      name = "gold",
-      qty = 10,
-      sp = 18
-    }
-  )
 end
 
 function update_game()
@@ -79,6 +73,9 @@ function draw_game()
   spr(plr.sp, plr.x, plr.y)
 
   draw_hotbar()
+
+  spr(18, 4, 4)
+  print("X " .. plr.gp .. "gp", 15, 5, 7)
 end
 
 function gen_map()
@@ -243,7 +240,7 @@ function plant(x, y)
         wtd = false,
         sp = 2,
         tig = 0,
-        si = 300 + rnd(300)
+        si = 200 + rnd(200)
       }
     )
     seeds.qty -= 1
