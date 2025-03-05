@@ -1,7 +1,9 @@
 function init_game()
-  gen_map()
-
   crops = {}
+  trees = {}
+  rocks = {}
+
+  gen_map()
 
   for y = 4, 16 do
     for x = 0, 16 do
@@ -10,7 +12,7 @@ function init_game()
           x = 60,
           y = 32,
           sp = 12,
-          gp=10
+          gp = 10
         }
         break
       end
@@ -19,6 +21,11 @@ function init_game()
 
   inv_sel = 1
   plr_inv = {}
+  add(plr_inv,{
+    name="axe",
+    qty=1,
+    sp=49
+  })
 end
 
 function update_game()
@@ -41,11 +48,19 @@ function update_game()
     local ptx = flr((plr.x + 4) / 8)
     local pty = flr((plr.y + 6) / 8)
 
+    if next_to_rock(ptx, pty) and holding("pick") then
+      damage_rock(ptx, pty)
+    end
+
+    if next_to_tree(ptx, pty) and holding("axe") then
+      damage_tree(ptx, pty)
+    end
+
     if over_planted_seeds(ptx, pty) then
       water(ptx, pty)
     end
 
-    if over_farmable_land(ptx, pty) and seeds_selected() then
+    if over_farmable_land(ptx, pty) and holding("seeds") then
       plant(ptx, pty)
     end
 
@@ -76,11 +91,18 @@ function draw_game()
 
   spr(18, 4, 4)
   print("X " .. plr.gp .. "gp", 15, 5, 7)
+
+  for i=1,#trees do
+    print("("..trees[i].x..","..trees[i].y..")",75,i * 6, 7)
+  end
+  local px = flr(plr.x/8)
+  local py = flr(plr.y/8)
+  print("["..px..","..py.."]", 75,#trees * 6 + 6, 7)
 end
 
 function gen_map()
-  for y = 4, 16 do
-    for x = 0, 16 do
+  for y = 4, 15 do
+    for x = 0, 15 do
       local map_tile = mget(x, y)
       if is_tree_tile(map_tile) then
         goto continue
@@ -98,17 +120,26 @@ function gen_map()
       end
 
       -- rocks
-      if rnd() < 0.07 then
-        mset(x, y, 37)
+      if rnd() < 0.06 then
+        mset(x, y, 6)
+        add(rocks, {
+          x = x,
+          y = y,
+          dmg = 0,
+          sp = 6
+        })
       end
 
       -- trees
       if rnd() < 0.03 then
         if not_on_tree(x, y) then
-          mset(x, y, 19)
-          mset(x + 1, y, 20)
-          mset(x, y + 1, 35)
-          mset(x + 1, y + 1, 36)
+          map_tree(x, y, 19)
+          add(trees, {
+            x = x,
+            y = y,
+            dmg = 0,
+            sp = 19
+          })
         end
       end
       ::continue::
@@ -125,6 +156,36 @@ function gen_map()
   -- fence post ends
   mset(6, 3, 27)
   mset(9, 3, 43)
+end
+
+function next_to_rock(x, y)
+  for r in all(rocks) do
+    if (r.x == x and r.y == y)
+        or (r.x == x and r.y - 1 == y)
+        or (r.x == x and r.y + 1 == y)
+        or (r.x - 1 == x and r.y == y)
+        or (r.x + 1 == x and r.y == y) then
+      return true
+    end
+  end
+  return false
+end
+
+function map_tree(x, y, sp)
+  mset(x, y, sp)
+  mset(x + 1, y, sp + 1)
+  mset(x, y + 1, sp + 16)
+  mset(x + 1, y + 1, sp + 17)
+end
+
+function next_to_tree(x, y)
+  for t in all(trees) do
+    if (t.x >= x - 1 and t.x <= x + 1)
+        or (t.y >= y - 1 and t.y <= y + 1) then
+      return true
+    end
+  end
+  return false
 end
 
 function not_on_tree(x, y)
@@ -198,8 +259,8 @@ function at_store(x, y)
   return fget(mget(x, y), 3)
 end
 
-function seeds_selected()
-  return plr_inv[inv_sel].name == "seeds"
+function holding(name)
+  return plr_inv[inv_sel].name == name
 end
 
 function get_inv_item_by_name(t, name)
@@ -226,6 +287,42 @@ function draw_hotbar()
 
   if #plr_inv > 0 then
     rect(23 + (10 * inv_sel) + (2 * (inv_sel - 1)), 113, 32 + (10 * inv_sel) + (2 * (inv_sel - 1)), 122, 10)
+  end
+end
+
+function damage_rock(x, y)
+  for r in all(rocks) do
+    if (r.x == x and r.y == y)
+        or (r.x == x and r.y - 1 == y)
+        or (r.x == x and r.y + 1 == y)
+        or (r.x - 1 == x and r.y == y)
+        or (r.x + 1 == x and r.y == y) then
+      if r.dmg < 4 then
+        r.dmg += 1
+        r.sp += 1
+        mset(r.x, r.y, r.sp)
+      else
+        mset(r.x, r.y, 0)
+        del(rocks, r)
+      end
+    end
+  end
+end
+
+function damage_tree(x, y)
+  for t in all(trees) do
+    if (t.x >= x - 1 and t.x <= x + 1)
+        or (t.y >= y - 1 and t.y <= y + 1) then
+      if t.dmg < 4 then
+        t.dmg += 1
+        t.sp += 2
+        map_tree(t.x, t.y, t.sp)
+      else
+        mset(t.x, t.y, 0)
+        del(trees, t)
+      end
+
+    end
   end
 end
 

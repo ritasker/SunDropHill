@@ -81,7 +81,7 @@ function update_buy_menu()
     if btnp(❎) then
         local store_item = store_inv[m_sel]
         local plr_item = get_inv_item_by_name(plr_inv, store_item.name)
-        if plr.gp > 0 and plr.gp > store_item.gp then
+        if plr.gp > 0 and plr.gp >= store_item.gp then
             if plr_item != nil then
                 plr_item.qty += 1
             else
