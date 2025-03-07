@@ -21,10 +21,10 @@ function init_game()
 
   inv_sel = 1
   plr_inv = {}
-  add(plr_inv,{
-    name="axe",
-    qty=1,
-    sp=49
+  add(plr_inv, {
+    name = "axe",
+    qty = 1,
+    sp = 49
   })
 end
 
@@ -92,12 +92,12 @@ function draw_game()
   spr(18, 4, 4)
   print("X " .. plr.gp .. "gp", 15, 5, 7)
 
-  for i=1,#trees do
-    print("("..trees[i].x..","..trees[i].y..")",75,i * 6, 7)
+  for i = 1, #trees do
+    print("(" .. trees[i].x .. "," .. trees[i].y .. ")", 75, i * 6, 7)
   end
-  local px = flr(plr.x/8)
-  local py = flr(plr.y/8)
-  print("["..px..","..py.."]", 75,#trees * 6 + 6, 7)
+  local px = flr(plr.x / 8)
+  local py = flr(plr.y / 8)
+  print("[" .. px .. "," .. py .. "]", 75, #trees * 6 + 6, 7)
 end
 
 function gen_map()
@@ -172,16 +172,23 @@ function next_to_rock(x, y)
 end
 
 function map_tree(x, y, sp)
-  mset(x, y, sp)
-  mset(x + 1, y, sp + 1)
-  mset(x, y + 1, sp + 16)
-  mset(x + 1, y + 1, sp + 17)
+  if sp == 0 then
+    mset(x, y, 0)
+    mset(x + 1, y, 0)
+    mset(x, y + 1, 0)
+    mset(x + 1, y + 1, 0)
+  else
+    mset(x, y, sp)
+    mset(x + 1, y, sp + 1)
+    mset(x, y + 1, sp + 16)
+    mset(x + 1, y + 1, sp + 17)
+  end
 end
 
 function next_to_tree(x, y)
   for t in all(trees) do
     if (t.x >= x - 1 and t.x <= x + 1)
-        or (t.y >= y - 1 and t.y <= y + 1) then
+        and (t.y >= y - 1 and t.y <= y + 1) then
       return true
     end
   end
@@ -297,11 +304,13 @@ function damage_rock(x, y)
         or (r.x == x and r.y + 1 == y)
         or (r.x - 1 == x and r.y == y)
         or (r.x + 1 == x and r.y == y) then
-      if r.dmg < 4 then
+      if r.dmg < 3 then
         r.dmg += 1
         r.sp += 1
         mset(r.x, r.y, r.sp)
-      else
+      end
+
+      if r.dmg >= 3 then
         mset(r.x, r.y, 0)
         del(rocks, r)
       end
@@ -312,16 +321,17 @@ end
 function damage_tree(x, y)
   for t in all(trees) do
     if (t.x >= x - 1 and t.x <= x + 1)
-        or (t.y >= y - 1 and t.y <= y + 1) then
-      if t.dmg < 4 then
+        and (t.y >= y - 1 and t.y <= y + 1) then
+      if t.dmg < 3 then
         t.dmg += 1
         t.sp += 2
         map_tree(t.x, t.y, t.sp)
-      else
-        mset(t.x, t.y, 0)
-        del(trees, t)
       end
 
+      if t.dmg >= 3 then
+        map_tree(t.x, t.y, 0)
+        del(trees, t)
+      end
     end
   end
 end
