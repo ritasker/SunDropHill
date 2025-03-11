@@ -109,6 +109,7 @@ function update_sell_menu()
         if carrots != nil and carrots.qty > 0 then
             plr.gp += carrots.gp
             carrots.qty -= 1
+            sfx(3)
 
             if carrots.qty == 0 then
                 del(plr_inv, carrots)
