@@ -94,6 +94,7 @@ function update_buy_menu()
                 )
             end
             plr.gp -= store_item.gp
+            sfx(3)
         end
     end
 

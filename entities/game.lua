@@ -58,14 +58,17 @@ function update_game()
 
     if over_planted_seeds(ptx, pty) then
       water(ptx, pty)
+      sfx(2)
     end
 
     if over_farmable_land(ptx, pty) and holding("seeds") then
       plant(ptx, pty)
+      sfx(0)
     end
 
     if over_fully_grown_crop(ptx, pty) then
       harvest(ptx, pty)
+      sfx(1)
     end
 
     if at_store(ptx, pty) then
@@ -350,7 +353,6 @@ function plant(x, y)
       inv_sel = 1
     end
   end
-  sfx(0)
 end
 
 function water(x, y)
@@ -383,7 +385,6 @@ function harvest(x, y)
       end
     end
   end
-  sfx(1)
 end
 
 function ply_ani()
