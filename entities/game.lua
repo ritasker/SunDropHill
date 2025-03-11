@@ -91,13 +91,6 @@ function draw_game()
 
   spr(18, 4, 4)
   print("X " .. plr.gp .. "gp", 15, 5, 7)
-
-  for i = 1, #trees do
-    print("(" .. trees[i].x .. "," .. trees[i].y .. ")", 75, i * 6, 7)
-  end
-  local px = flr(plr.x / 8)
-  local py = flr(plr.y / 8)
-  print("[" .. px .. "," .. py .. "]", 75, #trees * 6 + 6, 7)
 end
 
 function gen_map()
@@ -357,6 +350,7 @@ function plant(x, y)
       inv_sel = 1
     end
   end
+  sfx(0)
 end
 
 function water(x, y)
@@ -389,6 +383,7 @@ function harvest(x, y)
       end
     end
   end
+  sfx(1)
 end
 
 function ply_ani()
